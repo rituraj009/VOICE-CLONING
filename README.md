@@ -19,3 +19,10 @@ Create a voice cloning model that can generate a synthetic voice that sounds lik
 4. The smaller version of the model can fit into GPUs with less than 4GB VRAM or can be run on CPU standalone.
 
 Note: Running the full version of BARK on GPUs with limited VRAM is possible but might result in slower processing times as the GPU needs to handle memory constraints by swapping data between VRAM and system RAM.
+
+## Code Implementation
+
+Step 1: Install the BARK model:
+```
+pip install git+https://github.com/suno-ai/bark.git
+```
