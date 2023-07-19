@@ -22,7 +22,69 @@ Note: Running the full version of BARK on GPUs with limited VRAM is possible but
 
 ## Code Implementation
 
-Step 1: Install the BARK model:
+Step 1: Install the BARK model
 ```
 pip install git+https://github.com/suno-ai/bark.git
 ```
+
+Step 2: GPU Configuration (Optional)
+```
+import os
+os.environ["SUNO_OFFLOAD_CPU"] = "False"
+os.environ["SUNO_USE_SMALL_MODELS"] = "True"
+```
+These environment variables can be set to utilize GPU power (SUNO_OFFLOAD_CPU = "False") or to utilize CPU power (SUNO_OFFLOAD_CPU = "True"). Adjust the settings based on your hardware capabilities.
+
+Step 3: Import Required Modules
+```
+from bark import SAMPLE_RATE, generate_audio, preload_models
+from IPython.display import Audio
+import nltk
+import numpy as np
+```
+
+* SAMPLE_RATE represents the audio sampling rate used by BARK.
+* generate_audio is a function that converts text prompts into audio.
+* preload_models is a function to download and load necessary BARK models.
+* Audio is used to display audio data as an interactive audio player in the notebook.
+* nltk is used for sentence tokenization.
+* numpy is imported as np for array operations
+
+Step 4: Define the Script and Split Sentences
+```
+script = """
+Hey Raj,
+John here from the Recruitment Team at OpeninApp. 
+Thank you so much for expressing interest and applying for the role of AI Engineer Intern.
+As part of the next steps in our screening process, please complete the technical assessment attached in the PDF below and share a screen recording explaining your code.
+You can choose 1 of the 2 assignments below. Deadlines are mentioned within each file. We look forward to hearing from you once the assessment is completed.
+""".replace("\n", " ").strip()
+
+sentences = nltk.sent_tokenize(script)
+```
+* The script variable contains the text that will be converted to speech.
+* nltk.sent_tokenize is used to split the script into individual sentences.
+
+Step 5: Generate Audio Pieces with Pauses
+```
+SPEAKER = "v2/en_speaker_6"
+silence = np.zeros(int(0.25 * SAMPLE_RATE))
+
+pieces = []
+for sentence in sentences:
+    audio_array = generate_audio(sentence, history_prompt=SPEAKER)
+    pieces += [audio_array, silence.copy()]
+
+Audio(np.concatenate(pieces), rate=SAMPLE_RATE)
+```
+
+* SPEAKER represents the selected preset of the voice.
+* silence is an array of zeros representing a quarter second of silence.
+* The loop iterates over each sentence, generating audio for each sentence and appending it to the pieces list along with a copy of the silence array.
+* Finally, the Audio function is used to concatenate and play the audio pieces.
+
+This implementation demonstrates how to use the BARK model to convert text into synthesized speech, approximate the voice of a specific person, and introduce pauses between sentences for natural speech flow.
+
+NOTE: The speaker preset (SPEAKER) can be adjusted according to the desired voice characteristics.
+
+
